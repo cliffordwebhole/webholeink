@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace WebholeInk\Content;
+
+require_once __DIR__ . '/Parsedown.php';
+
+final class Markdown
+{
+    private \Parsedown $parser;
+
+    public function __construct()
+    {
+        $this->parser = new \Parsedown();
+        $this->parser->setSafeMode(true);
+    }
+
+    public function renderFile(string $path): string
+    {
+        if (!is_file($path)) {
+            return '<p><em>Content not found.</em></p>';
+        }
+
+        return $this->parser->text(
+            file_get_contents($path)
+        );
+    }
+}

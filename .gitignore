@@ -1,0 +1,22 @@
+# OS / editor
+.DS_Store
+*.swp
+*.log
+
+# Environment
+.env
+.env.local
+
+# Docker runtime noise
+docker/data/
+docker/tmp/
+
+# Cache / temp
+app/storage/cache/
+app/storage/tmp/
+
+# User content (site-specific, not engine)
+content/
+
+# Public runtime artifacts
+public/themes/*/assets/css/*.map
