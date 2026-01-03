@@ -76,11 +76,12 @@ nav_order: 10
 ---
 ```
 ## Supported Fields
-#Field --------------------------------#Purpose
-title -----------------------------<title> and page heading
-description-------------------------Meta description
-nav---------------------------------Include in navigation
-nav_order---------------------------Navigation sort order
+| Field | Purpose |
+|----|----|
+| title | <title> and page heading |
+| description | Meta description |
+| nav |Include in navigation |
+| nav_order | Navigation sort order |
 
 Pages without front matter are valid but discouraged.
 ---
@@ -91,15 +92,15 @@ Posts are time-based, publishable entries intended for chronological reading and
 Posts are not pages.
 ---
 ## Post Filenames
-Posts MUST follow this format:
-YYYY-MM-DD-slug.md
-Example:
-2026-01-03-core-stable.md
+Posts MUST follow this format:YYYY-MM-DD-slug.md
+Example:2026-01-03-core-stable.md
 The date is used for sorting. The slug is used for routing.
 ---
 ## Post Routing
-URL: /posts            >>>>>>>>>>>Source: Posts index
-URL: /posts/core-stable >>>>>>>>>>Source: Single post
+|URL | Source |
+|----|----|
+| `/posts` | Posts index |
+| `/posts/core-stable` | Single post |
 The filename date is never exposed in the URL
 ---
 ## Required Post Front Matter
