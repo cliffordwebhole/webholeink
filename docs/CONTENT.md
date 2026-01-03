@@ -1,43 +1,70 @@
-# CONTENT.md (Contract)
+# CONTENT.md
+WebholeInk Content Contract (LOCKED)
 
-This document defines content resolution rules in WebholeInk v0.1.x.
+Status: **Stable**
+Version: **v0.1.0-core**
+Audience: Core maintainers and contributors
 
-## Content roots
-- Pages live under: `content/pages/`
-- Navigation data lives under: `content/navigation.php`
-- Posts/media are reserved for future use
-
-## Page resolution
-- URL path `/` maps to `content/pages/home.md`
-- URL path `/about` maps to `content/pages/about.md`
-- URL path `/philosophy` maps to `content/pages/philosophy.md`
-
-## Slug rules
-- Lowercase recommended
-- One file per slug: `{slug}.md`
-- No nested directories required in v0.1.x
-
-## Markdown rendering
-- Markdown is converted to HTML via Parsedown
-- Raw HTML inside markdown is permitted unless explicitly restricted later
-
-## Not found
-If resolved file does not exist:
-- return 404 via PageHandler
-  
-## Front Matter (Optional but Recommended)
-
-Pages may define YAML front matter at the top of the file.
-
-Supported fields:
-
-- title (string) — Used for the HTML <title>
-- description (string) — Used for <meta name="description">
-
-Example: title: 
-- title: About
-- description: About WebholeInk
 ---
-## Contract lock
-Any change to these rules must update this doc first.
 
+## Purpose
+
+This document defines the **content model and rules** for WebholeInk.
+
+Content behavior described here is **intentional, minimal, and locked**.
+Any deviation requires a documented design decision and version bump.
+
+WebholeInk is a **file-first publishing engine**.
+Markdown files are the single source of truth.
+
+---
+
+## Content Directory Structure
+content/ ├── pages/ │   ├── home.md │   ├── about.md │   ├── philosophy.md │   └── *.md ├── posts/        (reserved for future use) ├── media/        (static assets) └── navigation.php (optional legacy/manual override)
+Only `content/pages/*.md` are treated as routable pages.
+
+---
+
+## Page Resolution Rules
+
+- Each file in `content/pages/` represents **one page**
+- Filename (without `.md`) becomes the URL slug
+- Examples:
+  - `about.md` → `/about`
+  - `philosophy.md` → `/philosophy`
+  - `home.md` → `/` (special case)
+
+Routing is **static and deterministic**.
+There are no dynamic parameters or database lookups.
+
+---
+
+## Home Page Rules (Special Case)
+
+`home.md` is a **content file**, not hardcoded HTML.
+
+- It **must** exist
+- It resolves to `/`
+- It is rendered using the same pipeline as all other pages
+- It may appear in navigation if configured
+
+There is **no separate “home template logic”**
+beyond view selection.
+
+---
+
+## Markdown File Format
+
+Each page **must** be valid Markdown.
+
+Optional front matter is supported.
+
+### Front Matter Format
+
+```yaml
+---
+title: Page Title
+description: Meta description text
+nav: true
+nav_order: 10
+---
