@@ -167,5 +167,6 @@ _Developer-first publishing, without compromise._
 - [Navigation Contract](docs/NAVIGATION.md)
 - [Project Status](docs/STATUS.md)
 
-## License
-TBD
+## 📄 License
+
+WebholeInk is open-source software licensed under the MIT License.
