@@ -34,11 +34,9 @@ Supported fields:
 - title (string) — Used for the HTML <title>
 - description (string) — Used for <meta name="description">
 
-Example:
-
----
-title: About
-description: About WebholeInk
+Example: title: 
+- title: About
+- description: About WebholeInk
 ---
 ## Contract lock
 Any change to these rules must update this doc first.
