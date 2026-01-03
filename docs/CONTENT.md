@@ -24,6 +24,22 @@ This document defines content resolution rules in WebholeInk v0.1.x.
 ## Not found
 If resolved file does not exist:
 - return 404 via PageHandler
+  
+## Front Matter (Optional but Recommended)
 
+Pages may define YAML front matter at the top of the file.
+
+Supported fields:
+
+- title (string) — Used for the HTML <title>
+- description (string) — Used for <meta name="description">
+
+Example:
+
+---
+title: About
+description: About WebholeInk
+---
 ## Contract lock
 Any change to these rules must update this doc first.
+
