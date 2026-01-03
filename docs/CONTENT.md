@@ -38,20 +38,22 @@ No other content roots are permitted in v1.
 ---
 
 ## Pages
-
-### Location content/pages/
+Location = content/pages/
 ### Purpose
 
 Pages represent **timeless, stable site content**.
 
 Examples:
+
 - Home
+- 
 - About
+- 
 - Philosophy
+- 
 - Legal pages
 
 Pages are not chronological.
-
 ---
 
 ### Page Routing
@@ -75,6 +77,7 @@ nav: true
 nav_order: 10
 ---
 ```
+Pages without front matter are valid but discouraged.
 ## Supported Fields
 | Field | Purpose |
 |----|----|
@@ -83,19 +86,20 @@ nav_order: 10
 | nav |Include in navigation |
 | nav_order | Navigation sort order |
 
-Pages without front matter are valid but discouraged.
 ---
 ## Posts
-Location content/posts/
-Purpose
+Location -> content/posts/
+
 Posts are time-based, publishable entries intended for chronological reading and long-form writing.
 Posts are not pages.
----
+
 ## Post Filenames
 Posts MUST follow this format:YYYY-MM-DD-slug.md
+
 Example:2026-01-03-core-stable.md
+
 The date is used for sorting. The slug is used for routing.
----
+
 ## Post Routing
 |URL | Source |
 |----|----|
@@ -104,61 +108,91 @@ The date is used for sorting. The slug is used for routing.
 The filename date is never exposed in the URL
 ---
 ## Required Post Front Matter
----
 title: Core Stable Release
-date: 2026-01-03
-published: true
-description: WebholeInk v0.1.0 is now stable
-^^^^^^^^^^^^^^^^^^^^^^^^
-Posts with published: false are not routable.
----
 
-## Post Visibility Rules
+date: 2026-01-03
+
+published: true
+
+description: WebholeInk v0.1.0 is now stable
+
+Posts with published: false are not routable.
+
+## Post Visibility Rules 
 published: true → visible and routable
+
 published: false → hidden, returns 404
+
 There is no draft preview in v1.
----
+
 ## Navigation Data
 content/navigation.php
+
 ## Purpose
 Navigation data defines the primary site menu.
-Navigation MAY be:
-Explicit (manual array)
+
+Navigation MAY be: Explicit (manual array)
+
 Automatically generated from Pages (v1 enhancement)
+
 Posts are not included in navigation by default.
----
+
 ## Markdown Parsing
 All content files are Markdown.
+
 Parsing rules:
+
 Front matter is extracted first
+
 Markdown body is parsed after front matter removal
+
 HTML output is escaped where appropriate
+
 Parsed HTML is passed to the view layer
+
 No Markdown extensions are enabled beyond standard syntax.
----
+
 ## Rendering Flow (All Content)
+
 Resolve file
+
 Parse front matter
+
 Validate required fields
+
 Parse Markdown → HTML
+
 Inject metadata (title, description)
+
 Render via theme templates
+
 Wrap in Layout
+
 Every step is required.
----
+
 ## What Content Does NOT Include (v1)
 Tags
+
 Categories
+
 Search
+
 Pagination
+
 RSS feeds
+
 Comments
+
 Media management UI
+
 Any additions require:
+
 New contract
+
 Version bump
+
 Explicit approval
----
+
 ## Stability Guarantee
 This contract is LOCKED for v1.
 Changes require:
