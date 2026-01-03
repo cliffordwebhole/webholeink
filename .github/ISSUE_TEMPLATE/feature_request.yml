@@ -1,0 +1,42 @@
+name: 💡 Feature Proposal
+description: Propose a feature or improvement
+title: "[Proposal]: "
+labels: ["proposal"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        WebholeInk core is locked as of v0.1.0-core-stable.
+        Feature proposals require discussion before implementation.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What problem does this feature address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why this belongs in WebholeInk
+      description: Explain how this aligns with WebholeInk philosophy.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Should this live in core or outside core?
+    validations:
+      required: true
+
+  - type: textarea
+    id: contracts
+    attributes:
+      label: Related contracts
+      description: Reference CORE.md, CONTENT.md, etc.
