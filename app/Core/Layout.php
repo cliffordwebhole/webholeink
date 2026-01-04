@@ -6,21 +6,62 @@ namespace WebholeInk\Core;
 
 final class Layout
 {
-    private string $themePath;
-
     public function __construct(
-        private Navigation $navigation,
-        string $theme = 'default'
-    ) {
-        $this->themePath = WEBHOLEINK_ROOT . '/app/themes/' . $theme;
+        private Navigation $navigation
+    ) {}
+
+    /**
+     * @param array<string,mixed> $meta
+     */
+    public function render(string $content, array $meta = []): string
+    {
+        $title = htmlspecialchars(
+            (string)($meta['title'] ?? 'WebholeInk'),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        $description = '';
+        if (!empty($meta['description'])) {
+            $description = '<meta name="description" content="'
+                . htmlspecialchars((string)$meta['description'], ENT_QUOTES, 'UTF-8')
+                . '">' . PHP_EOL;
+        }
+
+        return '<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>' . $title . '</title>
+    ' . $description . '
+    <link rel="stylesheet" href="/themes/default/assets/css/style.css">
+</head>
+<body>
+' . $this->renderNavigation() . '
+<main>
+' . $content . '
+</main>
+</body>
+</html>';
     }
 
-    public function render(string $content): string
+    private function renderNavigation(): string
     {
-        $navigation = $this->navigation->items();
+        $html = '<nav><ul>';
 
-        ob_start();
-        require $this->themePath . '/layout.php';
-        return ob_get_clean();
+        foreach ($this->navigation->items() as $item) {
+            $label = (string) ($item['label'] ?? '');
+            $path  = (string) ($item['path'] ?? '/');
+
+            $html .= '<li><a href="'
+                . htmlspecialchars($path, ENT_QUOTES, 'UTF-8')
+                . '">'
+                . htmlspecialchars($label, ENT_QUOTES, 'UTF-8')
+                . '</a></li>';
+        }
+
+        $html .= '</ul></nav>';
+
+        return $html;
     }
 }

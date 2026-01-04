@@ -1,3 +1,9 @@
+---
+title: About 
+description: About WebholeInk
+nav: true
+nav_order: 2
+---
 **WebholeInk** is a minimal, security-first blogging engine for developers
 who value stability, ownership, and boring technology over features and hype.
 

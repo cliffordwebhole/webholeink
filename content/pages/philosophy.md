@@ -1,3 +1,10 @@
+---
+title: Philosophy 
+description: About WebholeInk's Philosophy 
+nav: true
+nav_order: 3
+---
+
 # WebholeInk – Philosophy
 
 WebholeInk is a blogging engine built for people who think in systems.
