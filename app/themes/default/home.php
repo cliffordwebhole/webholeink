@@ -17,6 +17,6 @@ declare(strict_types=1);
 
 ?>
 
-<h1>WebholeInk v1</h1>
+<h1><?= htmlspecialchars($meta['title'] ?? 'Home', ENT_QUOTES, 'UTF-8') ?></h1>
 
-<p>Welcome to WebholeInk.</p>
+<?= $content ?>

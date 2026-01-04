@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace WebholeInk\Http;
 
-use WebholeInk\Core\Layout;
-use WebholeInk\Core\Navigation;
-
 final class Response
 {
     public function __construct(
@@ -23,10 +20,7 @@ final class Response
             header($name . ': ' . $value);
         }
 
-        $layout = new Layout(
-            new Navigation()
-        );
-
-        echo $layout->render($this->body);
+        // 🚫 NO layout, NO navigation, NO rendering here
+        echo $this->body;
     }
 }

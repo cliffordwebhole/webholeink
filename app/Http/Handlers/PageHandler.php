@@ -6,29 +6,72 @@ namespace WebholeInk\Http\Handlers;
 
 use WebholeInk\Http\Request;
 use WebholeInk\Http\Response;
-use WebholeInk\Core\PageView;
+use WebholeInk\Core\PageResolver;
+use WebholeInk\Core\PostResolver;
+use WebholeInk\Core\Markdown;
+use WebholeInk\Core\View;
 
 final class PageHandler implements HandlerInterface
 {
     public function handle(Request $request): Response
     {
-        $slug = trim($request->path(), '/');
+        $path = trim($request->path(), '/');
+        $view = new View('default');
 
-        $file = WEBHOLEINK_CONTENT . '/pages/' . $slug . '.md';
+        /**
+         * -------------------------------------------------
+         * 1. Single blog posts: /posts/{slug}
+         * -------------------------------------------------
+         */
+        if (str_starts_with($path, 'posts/')) {
+            $slug = substr($path, strlen('posts/'));
 
-        if (!is_file($file)) {
-            return new Response('<h1>404 Not Found</h1>', 404);
+            $postResolver = new PostResolver(
+                __DIR__ . '/../../../content/posts'
+            );
+
+            $post = $postResolver->resolve($slug);
+
+            if ($post === null) {
+                return new Response('<h1>404 – Post not found</h1>', 404);
+            }
+
+            return new Response(
+                $view->render('post', [
+                    'content'     => $post['content'],
+                    'title'       => $post['meta']['title'] ?? 'WebholeInk',
+                    'description' => $post['meta']['description'] ?? '',
+                    'date'        => $post['meta']['date'] ?? '',
+                ])
+            );
         }
 
-        $markdown = file_get_contents($file);
-        $html = (new \Parsedown())->text($markdown);
+        /**
+         * -------------------------------------------------
+         * 2. Pages: content/pages/*.md
+         * -------------------------------------------------
+         */
+        $pageResolver = new PageResolver(
+            __DIR__ . '/../../../content'
+        );
 
-        $view = new PageView(WEBHOLEINK_ROOT . '/app/themes/default');
+        $page = $pageResolver->resolve($path);
+
+        if ($page === null) {
+            return new Response('<h1>404 – Page not found</h1>', 404);
+        }
+
+        // 🔑 THIS WAS MISSING
+        $markdown = new Markdown();
+        $parsed   = $markdown->parseWithFrontMatter($page['body']);
 
         return new Response(
-            $view->render('page', ['content' => $html]),
-            200,
-            ['Content-Type' => 'text/html; charset=UTF-8']
+            $view->render('page', [
+                'content'     => $parsed['html'],   // ← parsed HTML
+                'title'       => $page['meta']['title'] ?? 'WebholeInk',
+                'description' => $page['meta']['description'] ?? '',
+                'slug'        => $page['slug'],
+            ])
         );
     }
 }

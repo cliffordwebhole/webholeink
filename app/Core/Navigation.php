@@ -1,35 +1,36 @@
 <?php
-
 declare(strict_types=1);
 
 namespace WebholeInk\Core;
 
 final class Navigation
 {
-    /**
-     * @var array<int, array{label:string,path:string}>
-     */
-    private array $items;
+    private PageResolver $resolver;
 
-    public function __construct()
+    public function __construct(PageResolver $resolver)
     {
-        $file = WEBHOLEINK_CONTENT . '/navigation.php';
-
-        if (!is_file($file)) {
-            $this->items = [];
-            return;
-        }
-
-        $data = require $file;
-
-        $this->items = is_array($data) ? $data : [];
+        $this->resolver = $resolver;
     }
 
     /**
-     * Return navigation items.
+     * @return array<int,array{label:string,path:string,order:int}>
      */
     public function items(): array
     {
-        return $this->items;
+        // Base navigation from pages
+        $items = $this->resolver->navigationItems();
+
+        // Inject Posts index
+        $items[] = [
+            'label' => 'Posts',
+            'path'  => '/posts',
+            'order' => 10,
+        ];
+
+        usort($items, static function (array $a, array $b): int {
+            return ($a['order'] ?? 999) <=> ($b['order'] ?? 999);
+        });
+
+        return $items;
     }
 }

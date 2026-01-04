@@ -1,3 +1,10 @@
+---
+title: Home
+description: WebholeInk v1
+nav: true
+nav_order: 0
+---
+
 # WebholeInk v1
 
 Welcome to **WebholeInk**.
@@ -8,4 +15,4 @@ This is a developer-first publishing engine.
 - No plugins
 - No surprises
 
- Clifford & Houston Approved!
+ Clifford Webhole Approved!
