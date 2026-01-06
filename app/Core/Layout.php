@@ -28,12 +28,20 @@ final class Layout
                 . '">' . PHP_EOL;
         }
 
+        $canonical = '';
+        if (!empty($meta['canonical'])) {
+            $canonical = '<link rel="canonical" href="'
+                . htmlspecialchars((string)$meta['canonical'], ENT_QUOTES, 'UTF-8')
+                . '">' . PHP_EOL;
+        }
+
         return '<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <title>' . $title . '</title>
     ' . $description . '
+    ' . $canonical . '
     <link rel="stylesheet" href="/themes/default/assets/css/style.css">
 </head>
 <body>
@@ -63,5 +71,24 @@ final class Layout
         $html .= '</ul></nav>';
 
         return $html;
+    }
+
+    /**
+     * Base URL detection (proxy-safe)
+     */
+    private function baseUrl(): string
+    {
+        $scheme = 'http';
+
+        if (
+            (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+            || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        ) {
+            $scheme = 'https';
+        }
+
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+        return $scheme . '://' . $host;
     }
 }

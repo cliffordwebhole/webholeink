@@ -6,9 +6,9 @@ namespace WebholeInk\Http\Handlers;
 
 use WebholeInk\Http\Request;
 use WebholeInk\Http\Response;
+use WebholeInk\Core\Markdown;
 use WebholeInk\Core\PageResolver;
 use WebholeInk\Core\PostResolver;
-use WebholeInk\Core\Markdown;
 use WebholeInk\Core\View;
 
 final class PageHandler implements HandlerInterface
@@ -19,59 +19,79 @@ final class PageHandler implements HandlerInterface
         $view = new View('default');
 
         /**
-         * -------------------------------------------------
-         * 1. Single blog posts: /posts/{slug}
-         * -------------------------------------------------
+         * 1) Single posts: /posts/{slug}
          */
         if (str_starts_with($path, 'posts/')) {
-            $slug = substr($path, strlen('posts/'));
+            $slug = trim(substr($path, strlen('posts/')), '/');
 
-            $postResolver = new PostResolver(
-                __DIR__ . '/../../../content/posts'
-            );
-
+            $postResolver = new PostResolver(WEBHOLEINK_ROOT . '/content/posts');
             $post = $postResolver->resolve($slug);
 
             if ($post === null) {
-                return new Response('<h1>404 – Post not found</h1>', 404);
+                return new Response(
+                    $view->render('page', [
+                        'title'       => '404',
+                        'description' => '',
+                        'canonical'   => 'https://webholeink.org/posts/' . $slug,
+                        'content'     => '<h1>404 – Post not found</h1>',
+                    ]),
+                    404,
+                    ['Content-Type' => 'text/html; charset=UTF-8']
+                );
             }
+
+            $meta = $post['meta'] ?? [];
 
             return new Response(
                 $view->render('post', [
-                    'content'     => $post['content'],
-                    'title'       => $post['meta']['title'] ?? 'WebholeInk',
-                    'description' => $post['meta']['description'] ?? '',
-                    'date'        => $post['meta']['date'] ?? '',
-                ])
+                    'title'       => (string)($meta['title'] ?? 'WebholeInk'),
+                    'description' => (string)($meta['description'] ?? ''),
+                    'canonical'   => 'https://webholeink.org/posts/' . $slug,
+                    'date'        => (string)($meta['date'] ?? ''),
+                    'content'     => (string)($post['content'] ?? ''),
+                ]),
+                200,
+                ['Content-Type' => 'text/html; charset=UTF-8']
             );
         }
 
         /**
-         * -------------------------------------------------
-         * 2. Pages: content/pages/*.md
-         * -------------------------------------------------
+         * 2) Pages: content/pages/{slug}.md (home maps to /)
          */
-        $pageResolver = new PageResolver(
-            __DIR__ . '/../../../content'
-        );
-
+        $pageResolver = new PageResolver(WEBHOLEINK_ROOT . '/content');
         $page = $pageResolver->resolve($path);
 
         if ($page === null) {
-            return new Response('<h1>404 – Page not found</h1>', 404);
+            return new Response(
+                $view->render('page', [
+                    'title'       => '404',
+                    'description' => '',
+                    'canonical'   => 'https://webholeink.org' . $request->path(),
+                    'content'     => '<h1>404 – Page not found</h1>',
+                ]),
+                404,
+                ['Content-Type' => 'text/html; charset=UTF-8']
+            );
         }
 
-        // 🔑 THIS WAS MISSING
-        $markdown = new Markdown();
-        $parsed   = $markdown->parseWithFrontMatter($page['body']);
+        $md = new Markdown();
+        $parsed = $md->parseWithFrontMatter((string)($page['body'] ?? ''));
+
+        // PageResolver already parsed front matter; prefer it.
+        $meta = (array)($page['meta'] ?? []);
+        $slug = (string)($page['slug'] ?? 'home');
+
+        $canonicalPath = ($slug === 'home') ? '/' : '/' . $slug;
 
         return new Response(
             $view->render('page', [
-                'content'     => $parsed['html'],   // ← parsed HTML
-                'title'       => $page['meta']['title'] ?? 'WebholeInk',
-                'description' => $page['meta']['description'] ?? '',
-                'slug'        => $page['slug'],
-            ])
+                'title'       => (string)($meta['title'] ?? ucfirst($slug)),
+                'description' => (string)($meta['description'] ?? ''),
+                'canonical'   => 'https://webholeink.org' . $canonicalPath,
+                'content'     => (string)($parsed['html'] ?? ''),
+            ]),
+            200,
+            ['Content-Type' => 'text/html; charset=UTF-8']
         );
     }
 }

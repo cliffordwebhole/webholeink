@@ -1,14 +1,8 @@
-<?php
-/** @var string $title */
-/** @var string|null $date */
-/** @var string $content */
-?>
-
 <article>
-    <h1><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h1>
+    <h1><?= htmlspecialchars($meta['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></h1>
 
-    <?php if (!empty($date)): ?>
-        <small><?= htmlspecialchars($date, ENT_QUOTES, 'UTF-8') ?></small>
+    <?php if (!empty($meta['date'])): ?>
+        <small><?= htmlspecialchars($meta['date'], ENT_QUOTES, 'UTF-8') ?></small>
     <?php endif; ?>
 
     <div class="post-content">
