@@ -11,7 +11,7 @@ final class PostResolver
     ) {}
 
     /**
-     * Return all published posts for index
+     * Return all non-draft posts for index / feeds
      */
     public function index(): array
     {
@@ -19,27 +19,26 @@ final class PostResolver
 
         foreach (glob($this->postsDir . '/*.md') ?: [] as $file) {
             $raw = file_get_contents($file);
-            if ($raw === false) {
-                continue;
-            }
 
-            $md = new Markdown();
+            $md     = new Markdown();
             $parsed = $md->parseWithFrontMatter($raw);
-            $meta = $parsed['meta'];
+            $meta   = $parsed['meta'] ?? [];
 
-            // Draft protection
+            // ⛔ Exclude ONLY explicit drafts
             if (($meta['draft'] ?? false) === true) {
                 continue;
             }
 
-            $slug = $meta['slug'] ?? basename($file, '.md');
+            // ✅ Canonical slug: front-matter slug OR filename
+            $filenameSlug = basename($file, '.md');
+            $slug = (string) ($meta['slug'] ?? $filenameSlug);
 
             $posts[] = [
-                'slug'    => $slug,
-                'title'   => $meta['title'] ?? $slug,
-                'date'    => $meta['date'] ?? '',
-                'excerpt' => $meta['excerpt'] ?? '',
-                'updated' => $meta['updated'] ?? null,
+                'slug'        => $slug,
+                'title'       => (string) ($meta['title'] ?? $slug),
+                'description' => (string) ($meta['description'] ?? ''),
+                'date'        => (string) ($meta['date'] ?? ''),
+                'url'         => '/posts/' . $slug,
             ];
         }
 
@@ -52,28 +51,35 @@ final class PostResolver
     }
 
     /**
-     * Resolve a single published post
+     * Resolve a single post by slug (front-matter OR filename)
      */
-public function resolve(string $slug): ?array
-{
-    foreach (glob($this->postsDir . '/*.md') ?: [] as $file) {
-        $raw = file_get_contents($file);
+    public function resolve(string $slug): ?array
+    {
+        foreach (glob($this->postsDir . '/*.md') ?: [] as $file) {
+            $raw = file_get_contents($file);
 
-        $md = new Markdown();
-        $parsed = $md->parseWithFrontMatter($raw);
+            $md     = new Markdown();
+            $parsed = $md->parseWithFrontMatter($raw);
+            $meta   = $parsed['meta'] ?? [];
 
-        $metaSlug = $parsed['meta']['slug'] ?? null;
-        $fileSlug = basename($file, '.md');
+            // ⛔ Exclude ONLY explicit drafts
+            if (($meta['draft'] ?? false) === true) {
+                continue;
+            }
 
-        // Match front-matter slug OR legacy filename slug
-        if ($metaSlug === $slug || ($metaSlug === null && $fileSlug === $slug)) {
+            $filenameSlug = basename($file, '.md');
+            $postSlug = (string) ($meta['slug'] ?? $filenameSlug);
+
+            if ($postSlug !== $slug) {
+                continue;
+            }
+
             return [
-                'meta'    => $parsed['meta'],
+                'meta'    => $meta,
                 'content' => $parsed['html'],
             ];
         }
-    }
 
-    return null;
-}
+        return null;
+    }
 }

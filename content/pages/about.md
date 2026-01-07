@@ -43,7 +43,7 @@ more than convenience or growth.
 - Anyone who has outgrown WordPress
 
 If you want drag-and-drop editors, this project is not for you.
-
+Try Wordpress
 ---
 
 ## Project Status

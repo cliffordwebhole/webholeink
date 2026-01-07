@@ -21,28 +21,77 @@ final class Layout
             'UTF-8'
         );
 
-        $description = '';
-        if (!empty($meta['description'])) {
-            $description = '<meta name="description" content="'
-                . htmlspecialchars((string)$meta['description'], ENT_QUOTES, 'UTF-8')
-                . '">' . PHP_EOL;
+        $description = !empty($meta['description'])
+            ? htmlspecialchars((string)$meta['description'], ENT_QUOTES, 'UTF-8')
+            : '';
+
+        $url = htmlspecialchars(
+            (string)($meta['canonical'] ?? ''),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        $isDraft = !empty($meta['draft']);
+        $pageType = (string)($meta['type'] ?? 'website');
+
+        $ogImage = htmlspecialchars(
+            (string)($meta['og_image'] ?? '/og-default.png'),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        $head = [];
+
+        // Basic SEO
+        $head[] = "<title>{$title}</title>";
+
+        if ($description !== '') {
+            $head[] = "<meta name=\"description\" content=\"{$description}\">";
         }
 
-        $canonical = '';
-        if (!empty($meta['canonical'])) {
-            $canonical = '<link rel="canonical" href="'
-                . htmlspecialchars((string)$meta['canonical'], ENT_QUOTES, 'UTF-8')
-                . '">' . PHP_EOL;
+        if ($url !== '') {
+            $head[] = "<link rel=\"canonical\" href=\"{$url}\">";
         }
+
+        // Draft protection
+        if ($isDraft) {
+            $head[] = '<meta name="robots" content="noindex, nofollow">';
+        }
+
+        // Open Graph
+        $head[] = '<meta property="og:site_name" content="WebholeInk">';
+        $head[] = "<meta property=\"og:type\" content=\"{$pageType}\">";
+        $head[] = "<meta property=\"og:title\" content=\"{$title}\">";
+
+        if ($description !== '') {
+            $head[] = "<meta property=\"og:description\" content=\"{$description}\">";
+        }
+
+        if ($url !== '') {
+            $head[] = "<meta property=\"og:url\" content=\"{$url}\">";
+        }
+
+        $head[] = "<meta property=\"og:image\" content=\"{$ogImage}\">";
+
+        // Twitter / X
+        $head[] = '<meta name="twitter:card" content="summary_large_image">';
+        $head[] = "<meta name=\"twitter:title\" content=\"{$title}\">";
+
+        if ($description !== '') {
+            $head[] = "<meta name=\"twitter:description\" content=\"{$description}\">";
+        }
+
+        $head[] = "<meta name=\"twitter:image\" content=\"{$ogImage}\">";
 
         return '<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>' . $title . '</title>
-    ' . $description . '
-    ' . $canonical . '
+    ' . implode("\n    ", $head) . '
     <link rel="stylesheet" href="/themes/default/assets/css/style.css">
+    <link rel="alternate" type="application/rss+xml"
+      title="WebholeInk RSS"
+      href="https://webholeink.org/feed.xml">
 </head>
 <body>
 ' . $this->renderNavigation() . '
@@ -58,8 +107,8 @@ final class Layout
         $html = '<nav><ul>';
 
         foreach ($this->navigation->items() as $item) {
-            $label = (string) ($item['label'] ?? '');
-            $path  = (string) ($item['path'] ?? '/');
+            $label = (string)($item['label'] ?? '');
+            $path  = (string)($item['path'] ?? '/');
 
             $html .= '<li><a href="'
                 . htmlspecialchars($path, ENT_QUOTES, 'UTF-8')
@@ -71,24 +120,5 @@ final class Layout
         $html .= '</ul></nav>';
 
         return $html;
-    }
-
-    /**
-     * Base URL detection (proxy-safe)
-     */
-    private function baseUrl(): string
-    {
-        $scheme = 'http';
-
-        if (
-            (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-            || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        ) {
-            $scheme = 'https';
-        }
-
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-
-        return $scheme . '://' . $host;
     }
 }

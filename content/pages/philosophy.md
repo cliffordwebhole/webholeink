@@ -67,3 +67,4 @@ Nothing is hidden for convenience.
 WebholeInk exists so you can write — and trust that your words
 will still be accessible years from now.
 
+Why? Because Clifford Webhole said so.

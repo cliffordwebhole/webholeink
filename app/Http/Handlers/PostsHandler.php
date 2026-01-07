@@ -13,19 +13,19 @@ final class PostsHandler implements HandlerInterface
 {
     public function handle(Request $request): Response
     {
-        $view = new View('default');
-
         $resolver = new PostResolver(
             __DIR__ . '/../../../content/posts'
         );
 
+        // ✅ THIS IS THE CRITICAL LINE
         $posts = $resolver->index();
+
+        $view = new View('default');
 
         return new Response(
             $view->render('posts', [
-                'title'       => 'Posts',
-                'description' => 'Published articles from WebholeInk',
-                'posts'       => $posts,
+                'title' => 'Posts',
+                'posts' => $posts,
             ]),
             200,
             ['Content-Type' => 'text/html; charset=UTF-8']
