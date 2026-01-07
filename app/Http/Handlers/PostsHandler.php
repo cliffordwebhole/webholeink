@@ -17,12 +17,14 @@ final class PostsHandler implements HandlerInterface
             __DIR__ . '/../../../content/posts'
         );
 
+        // ✅ THIS IS THE CRITICAL LINE
         $posts = $resolver->index();
 
         $view = new View('default');
 
         return new Response(
             $view->render('posts', [
+                'title' => 'Posts',
                 'posts' => $posts,
             ]),
             200,
