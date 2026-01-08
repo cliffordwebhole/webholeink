@@ -1,139 +1,190 @@
-# Contributing to WebholeInk
+# CONTRIBUTING.md
 
-Thank you for your interest in contributing to **WebholeInk**.
+## Contributing to WebholeInk
 
-WebholeInk is intentionally minimal.  
-Contributions are welcome — but **only when they respect the project’s boundaries**.
+Thank you for your interest in contributing to WebholeInk.
 
-Please read this document carefully before opening an issue or pull request.
-
----
-
-## 🧱 Project Philosophy
-
-WebholeInk is built on these principles:
-
-- File-based content
-- Explicit behavior
-- No magic
-- No plugins
-- No silent abstraction
-- No hidden state
-
-If a proposed change violates these principles, it will not be accepted.
+Before opening an issue or pull request, **please read this document carefully**.
+WebholeInk is intentionally opinionated. Not all contributions are appropriate.
 
 ---
 
-## 🔒 Core Stability
+## Project Philosophy (Read First)
 
-The **core engine is locked** as of:
+WebholeInk is:
 
-> **v0.1.0-core-stable**
+- File-first
+- Database-free
+- Minimal by design
+- Built for long-term stability
+- Explicit over magical
+- Boring on purpose
 
-This includes (but is not limited to):
+If a contribution conflicts with these goals, it will be rejected —
+even if it is well-written or popular elsewhere.
 
-- Routing
-- Handlers
-- Content resolution
-- View system
-- Layout
-- Navigation
-- Theme loading
-
-Changes to core behavior **require discussion before code**.
-
-Do **not** submit pull requests that alter core contracts without opening an issue first.
+This is not a general-purpose CMS.
 
 ---
 
-## 📚 Contracts First
+## What Contributions Are Welcome
 
-Behavior in WebholeInk is defined by explicit contracts located in `/docs`.
+### ✅ Accepted Categories
 
-Examples:
-- `CORE.md`
-- `ROUTES.md`
-- `HANDLERS.md`
-- `CONTENT.md`
-- `VIEW.md`
-- `NAVIGATION.md`
-- `THEMES.md`
-
-If a change is not reflected in the documentation, it is incomplete.
-
-**Documentation updates must accompany behavior changes.**
+- Bug fixes
+- Security improvements
+- Performance improvements
+- Documentation corrections or expansions
+- Test coverage improvements
+- CLI tooling that supports existing workflows
+- Explicit, opt-in features that do not affect defaults
 
 ---
 
-## 🧪 What Is Welcome
+### ❌ Not Accepted
 
-Contributions that are welcome without prior approval:
-
-- Documentation improvements
-- Typo fixes
-- Clarifications
-- Examples
-- New themes
-- CSS improvements
-- Optional tooling (outside core)
-
----
-
-## 🚫 What Is Not Accepted
-
-The following will be rejected without review:
+The following will **not** be merged:
 
 - Plugin systems
-- Admin dashboards
-- Databases added to core
-- Implicit behavior
-- Hidden configuration
-- Auto-magic conventions
-- Framework-style abstractions
+- Database integrations
+- Visual editors or WYSIWYG features
+- Tracking, analytics, or telemetry
+- Framework dependencies
+- Auto-magic configuration
+- SaaS integrations
+- Growth, engagement, or monetization features
 
-WebholeInk is **not** trying to compete with WordPress or Laravel.
-
----
-
-## 🧭 Feature Proposals
-
-If you want to propose a feature:
-
-1. Open an issue
-2. Describe the problem clearly
-3. Explain why it belongs *outside* or *on top of* core
-4. Reference existing contracts
-
-No code first. Discussion first.
+If your idea sounds like WordPress, Ghost, or Medium — it does not belong here.
 
 ---
 
-## 🛠 Development Guidelines
+## Contribution Workflow
 
-- PHP 8.2+
-- No external dependencies unless justified
-- No global state
-- Clear naming
-- Small files
-- Predictable behavior
+### 1. Fork the Repository
 
-Readable code beats clever code.
+Work must be done in a fork or feature branch.
+Direct pushes to `main` are restricted.
 
 ---
 
-## 📄 License
+### 2. Create a Focused Branch
 
-By contributing, you agree that your contributions will be licensed under the **MIT License**, the same license as the project.
+Use descriptive branch names:
+```
+fix/page-cache-header docs/update-deployment feat/cli-post-description
+
+```
+One concern per branch.
 
 ---
 
-## 🐝 Final Note
+### 3. Follow Existing Conventions
 
-WebholeInk is intentionally opinionated.
+Before writing code, review:
 
-If you love minimal systems, you’re in the right place.  
-If you want batteries included, this project is not for you — and that’s okay.
+- `ARCHITECTURE.md`
+- `STYLEGUIDE.md`
+- `CONTENT.md`
+- Existing source structure
 
-Thank you for respecting the craft.
+New code must **match the existing style**.
+This project values consistency over personal preference.
 
-— Clifford Webhole
+---
+
+### 4. Keep Changes Small and Explicit
+
+Good pull requests:
+
+- Do one thing
+- Explain why
+- Avoid refactors unless necessary
+- Do not introduce new abstractions casually
+
+If a change requires explanation, document it.
+
+---
+
+### 5. Tests & Verification
+
+If your change affects:
+
+- Routing
+- Rendering
+- Metadata
+- Feeds
+- Caching
+
+You **must** explain how it was tested.
+
+Example:
+
+```
+Tested by:
+- Visiting /about, /posts, /posts/{slug}
+- Validating RSS and JSON feeds
+- Confirming cache headers with curl -I
+```
+#  Documentation Changes
+
+Documentation is first-class.
+
+If behavior changes, documentation must be updated in the same pull request.
+
+Outdated docs are considered bugs.
+
+# Issues
+
+Issues are for:
+
+Confirmed bugs
+
+Security concerns
+
+Clear, actionable improvements
+
+Issues are not for:
+
+Feature requests without justification
+
+Opinion polls
+
+“Wouldn’t it be cool if…”
+
+Support questions
+
+If you are unsure, open a discussion first
+
+# Commit Messages
+
+Use clear, descriptive messages:
+
+```
+Fix cache invalidation on page updates
+Add JSON feed support
+Correct sitemap URL duplication
+```
+
+
+Avoid vague messages like:
+
+Update stuff
+```
+Fix things
+Changes
+```
+# Code of Conduct
+
+Be respectful. 
+Be technical. 
+Be direct.
+WebholeInk assumes contributors are competent adults. There is no separate Code of Conduct file — professionalism is expected.
+
+# Final Note
+WebholeInk is intentionally narrow in scope.
+
+If you want to build something larger, faster, or more flexible — this codebase may serve as a foundation, not a destination.
+
+That is acceptable.
+
+Thank you for respecting the boundaries of the project.
