@@ -188,6 +188,131 @@ Recommended approaches:
 - Cache revalidation checks
 
 Example:
-```bash
+```
 curl -I https://example.com/about
 curl https://example.com/posts/example-post
+
+```
+
+## Scripted Smoke Tests (Optional) 
+
+WebholeInk supports lightweight scripted checks to confirm that core behavior has not regressed. These tests are intentionally simple and require no testing framework. 
+
+--- 
+
+## Route Resolution Verify that pages and posts resolve correctly: `
+
+```
+ curl -s https://example.com/ | grep "<title>"
+ curl -s https://example.com/about | grep "<h1>"
+ curl -s https://example.com/posts/example-post | grep "<article>"
+
+```
+
+Expected:
+
+• Pages return rendered HTML
+
+• No raw Markdown appears
+
+• HTTP status is 200
+
+## Draft Exclusion
+
+Verify that draft posts are not visible:
+```
+curl -s https://example.com/posts | grep draft-post && echo "FAIL"
+
+```
+Expected:
+
+• Draft posts do not appear in output
+
+## Metadata Presence
+
+Verify required metadata:
+```
+curl -s https://example.com/about | grep "<meta name=\"description\"" curl -s
+https://example.com/posts/example-post | grep "<title>"
+
+```
+Expected:
+• <title> always present
+
+• <meta name="description"> present when defined
+
+## Cache Headers
+
+Verify cache behavior:
+```
+curl -I https://example.com/about
+
+```
+Expected headers:
+• ETag
+
+• Last-Modified
+
+• Cache-Control
+
+Revalidate cache:
+```
+curl -I -H 'If-None-Match: "etag-value"' https://example.com/about 
+
+```
+Expected:
+
+• 304 Not Modified when unchanged
+
+##  Feed Validation
+
+Verify RSS feed:
+```
+curl -s https://example.com/feed.xml 
+```
+Verify JSON feed:
+```
+curl -s https://example.com/feed.json | jq . 
+```
+Expected:
+
+• Valid XML / JSON
+
+• Published posts only
+
+• Correct URLs and dates
+
+## Sitemap Validation
+
+Verify sitemap:
+```
+curl -s https://example.com/sitemap.xml 
+```
+Expected:
+
+• Pages included
+
+• Published posts included
+
+• Drafts excluded
+
+• Canonical URLs only
+
+## When to Run Smoke Tests
+
+Run smoke tests when:
+
+• Modifying routing
+
+• Changing resolvers
+
+• Adjusting metadata handling
+
+• Altering caching behavior
+
+• Preparing a release tag
+
+Smoke tests should be quick, repeatable, and boring.
+
+--- 
+
