@@ -19,6 +19,13 @@ final class Navigation
     {
         // Base navigation from pages
         $items = $this->resolver->navigationItems();
+       // Inject Docs index
+       $items[] = [
+           'label' => 'Docs',
+           'path'  => '/docs',
+           'order' => 9,
+        ];
+
 
         // Inject Posts index
         $items[] = [
