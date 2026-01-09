@@ -16,7 +16,12 @@ app/storage/cache/
 app/storage/tmp/
 
 # User content (site-specific, not engine)
-content/
+# Ignore all content by default
+content/*
+
+# Track documentation
+!content/docs/
+!content/docs/**
 
 # Public runtime artifacts
 public/themes/*/assets/css/*.map
