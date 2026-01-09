@@ -9,6 +9,7 @@ use WebholeInk\Http\Response;
 use WebholeInk\Core\Markdown;
 use WebholeInk\Core\PageResolver;
 use WebholeInk\Core\PostResolver;
+use WebholeInk\Core\DocResolver;
 use WebholeInk\Core\View;
 
 final class PageHandler implements HandlerInterface
@@ -18,15 +19,72 @@ final class PageHandler implements HandlerInterface
         $path = trim($request->path(), '/');
         $view = new View('default');
 
-        /**
-         * 1) Single posts: /posts/{slug}
+/*
+ * -------------------------------------------------
+ * Docs index: /docs
+ * -------------------------------------------------
+ */
+if ($path === 'docs') {
+    $resolver = new \WebholeInk\Core\DocResolver(WEBHOLEINK_ROOT . '/content/docs');
+    $docs = $resolver->index();
+
+    return new Response(
+        $view->render('docs', [
+            'title'       => 'Documentation',
+            'description' => 'WebholeInk documentation',
+            'canonical'   => 'https://webholeink.org/docs',
+            'docs'        => $docs,
+        ]),
+        200,
+        ['Content-Type' => 'text/html; charset=UTF-8']
+    );
+}
+
+        /*
+         * -------------------------------------------------
+         * Docs: /docs/{slug}
+         * -------------------------------------------------
+         */
+        if (str_starts_with($path, 'docs/')) {
+            $slug = trim(substr($path, 5), '/');
+
+            $resolver = new DocResolver(WEBHOLEINK_ROOT . '/content/docs');
+            $doc = $resolver->resolve($slug);
+
+            if ($doc === null) {
+                return new Response(
+                    $view->render('page', [
+                        'title'       => '404',
+                        'description' => '',
+                        'canonical'   => 'https://webholeink.org/docs/' . $slug,
+                        'content'     => '<h1>404 – Document not found</h1>',
+                    ]),
+                    404
+                );
+            }
+
+            return new Response(
+                $view->render('page', [
+                    'title'       => (string) ($doc['meta']['title'] ?? ucfirst($slug)),
+                    'description' => (string) ($doc['meta']['description'] ?? ''),
+                    'canonical'   => 'https://webholeink.org/docs/' . $slug,
+                    'content'     => (string) $doc['content'],
+                ]),
+                200,
+                ['Content-Type' => 'text/html; charset=UTF-8'],
+                $doc['mtime']
+            );
+        }
+
+        /*
+         * -------------------------------------------------
+         * Posts: /posts/{slug}
+         * -------------------------------------------------
          */
         if (str_starts_with($path, 'posts/')) {
-            $slug = trim(substr($path, strlen('posts/')), '/');
+            $slug = trim(substr($path, 6), '/');
 
-            // Use the resolver for content, but do NOT assume filename = slug.md
-            $postsDir = WEBHOLEINK_ROOT . '/content/posts';
-            $postResolver = new PostResolver($postsDir);
+            $postResolver = new PostResolver(WEBHOLEINK_ROOT . '/content/posts');
             $post = $postResolver->resolve($slug);
 
             if ($post === null) {
@@ -37,115 +95,58 @@ final class PageHandler implements HandlerInterface
                         'canonical'   => 'https://webholeink.org/posts/' . $slug,
                         'content'     => '<h1>404 – Post not found</h1>',
                     ]),
-                    404,
-                    ['Content-Type' => 'text/html; charset=UTF-8']
+                    404
                 );
             }
 
-            $meta = (array)($post['meta'] ?? []);
-
-            // Find the real file path for this slug so filemtime() works
-            $contentFile = $this->findPostFileBySlug($postsDir, $slug);
-
-            // If we can't find it for some reason, fall back to theme/layout times only (no warnings)
-            $mtimeCandidates = [
-                filemtime(WEBHOLEINK_ROOT . '/app/Core/Layout.php'),
-                filemtime(WEBHOLEINK_ROOT . '/app/themes/default/post.php'),
-            ];
-
-            if ($contentFile !== null && is_file($contentFile)) {
-                $mtimeCandidates[] = filemtime($contentFile);
-            }
-
-            $lastModified = max($mtimeCandidates);
-
             return new Response(
                 $view->render('post', [
-                    'title'       => (string)($meta['title'] ?? 'WebholeInk'),
-                    'description' => (string)($meta['description'] ?? ''),
+                    'title'       => (string) ($post['meta']['title'] ?? 'WebholeInk'),
+                    'description' => (string) ($post['meta']['description'] ?? ''),
                     'canonical'   => 'https://webholeink.org/posts/' . $slug,
-                    'date'        => (string)($meta['date'] ?? ''),
-                    'content'     => (string)($post['content'] ?? ''),
+                    'date'        => (string) ($post['meta']['date'] ?? ''),
+                    'content'     => (string) $post['content'],
                 ]),
                 200,
-                ['Content-Type' => 'text/html; charset=UTF-8'],
-                $lastModified
+                ['Content-Type' => 'text/html; charset=UTF-8']
             );
         }
-/**
- * 2) Pages: content/pages/{slug}.md (home maps to /)
- */
-$pageResolver = new PageResolver(WEBHOLEINK_ROOT . '/content');
-$page = $pageResolver->resolve($path);
 
-if ($page === null) {
-    return new Response(
-        $view->render('page', [
-            'title'       => '404',
-            'description' => '',
-            'canonical'   => 'https://webholeink.org' . $request->path(),
-            'content'     => '<h1>404 – Page not found</h1>',
-        ]),
-        404,
-        ['Content-Type' => 'text/html; charset=UTF-8']
-    );
-}
+        /*
+         * -------------------------------------------------
+         * Pages
+         * -------------------------------------------------
+         */
+        $pageResolver = new PageResolver(WEBHOLEINK_ROOT . '/content');
+        $page = $pageResolver->resolve($path);
 
-$meta = (array) ($page['meta'] ?? []);
-$slug = (string) ($page['slug'] ?? 'home');
-
-$canonicalPath = ($slug === 'home') ? '/' : '/' . $slug;
-
-// Per-file Last-Modified (page content + layout + template)
-$contentFile = WEBHOLEINK_ROOT . '/content/pages/' . $slug . '.md';
-$lastModified = max(
-    is_file($contentFile) ? filemtime($contentFile) : 0,
-    filemtime(WEBHOLEINK_ROOT . '/app/Core/Layout.php'),
-    filemtime(WEBHOLEINK_ROOT . '/app/themes/default/page.php')
-);
-$md = new Markdown();
-$parsed = $md->parseWithFrontMatter((string) ($page['body'] ?? ''));
-
-return new Response(
-    $view->render('page', [
-        'title'       => (string) ($meta['title'] ?? ucfirst($slug)),
-        'description' => (string) ($meta['description'] ?? ''),
-        'canonical'   => 'https://webholeink.org' . $canonicalPath,
-        'content'     => (string) ($parsed['html'] ?? ''),
-    ]),
-    200,
-    ['Content-Type' => 'text/html; charset=UTF-8'],
-    $lastModified
-);
-
-    }
-
-    /**
-     * Find the actual post file path by matching front-matter slug.
-     * This respects your design: filename is NOT authoritative.
-     */
-    private function findPostFileBySlug(string $postsDir, string $slug): ?string
-    {
-        foreach (glob(rtrim($postsDir, '/') . '/*.md') ?: [] as $file) {
-            $raw = file_get_contents($file);
-            if ($raw === false) {
-                continue;
-            }
-
-            $md = new Markdown();
-            $parsed = $md->parseWithFrontMatter($raw);
-            $meta = (array)($parsed['meta'] ?? []);
-
-            // exclude explicit drafts
-            if (($meta['draft'] ?? false) === true) {
-                continue;
-            }
-
-            if (($meta['slug'] ?? null) === $slug) {
-                return $file;
-            }
+        if ($page === null) {
+            return new Response(
+                $view->render('page', [
+                    'title'       => '404',
+                    'description' => '',
+                    'canonical'   => 'https://webholeink.org' . $request->path(),
+                    'content'     => '<h1>404 – Page not found</h1>',
+                ]),
+                404
+            );
         }
 
-        return null;
+        $md = new Markdown();
+        $parsed = $md->parseWithFrontMatter((string) ($page['body'] ?? ''));
+
+        $slug = (string) ($page['slug'] ?? 'home');
+        $canonical = $slug === 'home' ? '/' : '/' . $slug;
+
+        return new Response(
+            $view->render('page', [
+                'title'       => (string) ($page['meta']['title'] ?? ucfirst($slug)),
+                'description' => (string) ($page['meta']['description'] ?? ''),
+                'canonical'   => 'https://webholeink.org' . $canonical,
+                'content'     => (string) ($parsed['html'] ?? ''),
+            ]),
+            200,
+            ['Content-Type' => 'text/html; charset=UTF-8']
+        );
     }
 }
