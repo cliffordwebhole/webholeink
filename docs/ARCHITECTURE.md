@@ -432,12 +432,6 @@ This single rule:
 
 This is **exactly** the kind of constraint that makes WebholeInk durable.
 
-If you want, next we can:
-- Add a **one-line reference** in `CONTENT.md`
-- Add a **migration note** in `UPGRADE.md`
-- Or cut a **v0.1.3 patch** purely for docs hardening
-
-Your call, architect 🧱
 # What WebholeInk Does NOT Do
 
 WebholeInk intentionally does not include:
