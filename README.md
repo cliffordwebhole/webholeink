@@ -178,7 +178,6 @@ Core principles will not change.
 ## 🐝 Built By
 
 Clifford Webhole  
-with Houston as copilot ☺️
 
 ---
 
