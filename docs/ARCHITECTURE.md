@@ -327,7 +327,117 @@ WebholeInk generates feeds dynamically:
 All are built from the same resolvers used by pages and posts.
 
 There is no duplication of logic.
+---
 
+# Static Assets & Images
+
+WebholeInk enforces a strict separation between **content** and **runtime assets**.
+
+### Non-Negotiable Rule
+
+**All images and static media MUST live under the `public/` directory.**
+
+public/ media/
+
+Anything outside `public/` is not web-accessible and will never be served.
+
+---
+
+### Rationale
+
+The web server is configured with:
+
+root /var/www/webholeink/public;
+
+This is intentional.
+
+It guarantees that:
+
+- Only explicitly exposed files are reachable
+- Markdown content is never executed or served directly
+- Static assets are handled by the web server, not PHP
+- The system remains auditable and predictable
+
+---
+
+### Content vs Assets
+
+| Directory | Purpose | Served by Web Server |
+|---------|--------|----------------------|
+| `content/` | Markdown source files | ❌ No |
+| `public/` | CSS, images, feeds, entry point | ✅ Yes |
+
+Markdown files may **reference** images, but must never **contain** them.
+
+---
+
+### Image Referencing Contract
+
+Images are referenced using absolute paths from the web root:
+
+```
+![Example](/media/pages/example.png)
+
+```
+No rewriting, copying, or transformation occurs at runtime.
+---
+
+## Rendering Responsibility
+
+WebholeInk does not manage image size, layout, or presentation.
+
+All visual behavior is handled by the active theme:
+```
+main img {
+    max-width: 640px;
+    height: auto;
+}
+```
+Content remains semantic. Presentation remains centralized.
+
+
+---
+
+## Explicit Non-Goals
+
+WebholeInk will never:
+- Scan content/ for images
+- Auto-copy files into public/
+- Resize or optimize images
+- Provide a media upload pipeline
+- Maintain a media registry
+
+These are platform features. WebholeInk is infrastructure.
+
+
+---
+
+## Architectural Guarantee
+
+This rule will not change without a major version bump.
+Static assets live in public/.
+Content lives in content/.
+There is no overlap by design.
+
+---
+
+### Why this matters
+
+This single rule:
+
+- Prevents entire classes of security bugs
+- Eliminates “magic” media behavior
+- Keeps deployments boring
+- Makes Docker, rsync, and backups trivial
+
+This is **exactly** the kind of constraint that makes WebholeInk durable.
+
+If you want, next we can:
+- Add a **one-line reference** in `CONTENT.md`
+- Add a **migration note** in `UPGRADE.md`
+- Or cut a **v0.1.3 patch** purely for docs hardening
+
+Your call, architect 🧱
 # What WebholeInk Does NOT Do
 
 WebholeInk intentionally does not include:
@@ -376,6 +486,7 @@ WebholeInk exists for people who value control over convenience.
 If you want drag-and-drop editing, auto-updates, or growth features, this project is not for you.
 
 If you want publishing infrastructure that you can still understand five years from now — welcome.
+
 
 
 
