@@ -1,5 +1,15 @@
 # UPGRADE.md
 
+## Theme Compatibility
+
+Theme files are versioned.
+
+- Existing theme versions will never be broken
+- New visual changes require a new theme version
+- Publishers may upgrade themes independently of engine updates
+
+Theme compatibility is guaranteed across minor releases.
+
 ## Upgrade Guide
 
 WebholeInk is designed so upgrades are **boring, explicit, and reversible**.
