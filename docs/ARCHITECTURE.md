@@ -202,6 +202,26 @@ Responsibilities:
 
 Handlers never parse Markdown themselves.
 
+## Theme System
+
+WebholeInk uses a **static, author-controlled theme system**.
+
+Themes are resolved at render time by the Layout engine using
+`app/config/theme.php`.
+
+This design ensures:
+
+- No client-side state
+- No user preference complexity
+- No cache invalidation issues
+- No JavaScript dependency
+
+The engine loads:
+1. Structural CSS (engine rules)
+2. One theme variable file (publisher choice)
+
+This approach prioritizes **stability, clarity, and long-term operability**
+over interactivity.
 
 # Views & Templates
 Templates live in: app/themes/default/ 
