@@ -15,6 +15,22 @@ final class Layout
      */
     public function render(string $content, array $meta = []): string
     {
+        // -------------------------------------------------
+        // Theme resolution (author-controlled)
+        // -------------------------------------------------
+        $themeConfig = require WEBHOLEINK_ROOT . '/app/config/theme.php';
+
+        $available = $themeConfig['available'] ?? ['classic'];
+        $default   = $themeConfig['default'] ?? 'classic';
+        $active    = $themeConfig['active'] ?? $default;
+
+        $theme = in_array($active, $available, true)
+            ? $active
+            : $default;
+
+        // -------------------------------------------------
+        // Metadata
+        // -------------------------------------------------
         $title = htmlspecialchars(
             (string)($meta['title'] ?? 'WebholeInk'),
             ENT_QUOTES,
@@ -31,7 +47,7 @@ final class Layout
             'UTF-8'
         );
 
-        $isDraft = !empty($meta['draft']);
+        $isDraft  = !empty($meta['draft']);
         $pageType = (string)($meta['type'] ?? 'website');
 
         $ogImage = htmlspecialchars(
@@ -40,9 +56,11 @@ final class Layout
             'UTF-8'
         );
 
+        // -------------------------------------------------
+        // Head construction
+        // -------------------------------------------------
         $head = [];
 
-        // Basic SEO
         $head[] = "<title>{$title}</title>";
 
         if ($description !== '') {
@@ -53,7 +71,6 @@ final class Layout
             $head[] = "<link rel=\"canonical\" href=\"{$url}\">";
         }
 
-        // Draft protection
         if ($isDraft) {
             $head[] = '<meta name="robots" content="noindex, nofollow">';
         }
@@ -83,15 +100,26 @@ final class Layout
 
         $head[] = "<meta name=\"twitter:image\" content=\"{$ogImage}\">";
 
+        // -------------------------------------------------
+        // Render
+        // -------------------------------------------------
         return '<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     ' . implode("\n    ", $head) . '
+
+    <!-- Base structural CSS (engine rules) -->
     <link rel="stylesheet" href="/themes/default/assets/css/style.css">
+
+    <!-- Theme variables (ONE file only) -->
+    <link rel="stylesheet" href="/themes/default/assets/css/theme-'
+        . htmlspecialchars($theme, ENT_QUOTES, 'UTF-8')
+        . '.v1.css">
+
     <link rel="alternate" type="application/rss+xml"
-      title="WebholeInk RSS"
-      href="https://webholeink.org/feed.xml">
+          title="WebholeInk RSS"
+          href="https://webholeink.org/feed.xml">
 </head>
 <body>
 ' . $this->renderNavigation() . '

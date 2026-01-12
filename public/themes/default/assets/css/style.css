@@ -1,25 +1,30 @@
-/* WebholeInk Default Theme – Visual Test */
-/* DEBUG: WebholeInk CSS ACTIVE */
-body {
-    background: #111 !important;
-    color: #0f0 !important;
-}
+/*
+|--------------------------------------------------------------------------
+| WebholeInk — Base Structural Styles
+|--------------------------------------------------------------------------
+| This file defines layout, spacing, typography, and structure.
+| ALL colors MUST come from CSS variables.
+| Theme identity lives in theme-*.css files only.
+|--------------------------------------------------------------------------
+*/
 
-nav {
-    border-bottom: 3px solid red !important;
-}
-
+/* -------------------------------------------------
+   Global Reset
+------------------------------------------------- */
 html, body {
     margin: 0;
     padding: 0;
-    background: #0e1116;
-    color: #e6e6e6;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
 }
 
+/* -------------------------------------------------
+   Navigation
+------------------------------------------------- */
 nav {
-    background: #151a21;
-    border-bottom: 1px solid #2a2f38;
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-border);
 }
 
 nav ul {
@@ -31,31 +36,50 @@ nav ul {
 }
 
 nav a {
-    color: #7dd3fc;
+    color: var(--link);
     text-decoration: none;
     font-weight: 600;
 }
 
 nav a:hover {
-    color: #38bdf8;
+    color: var(--link-hover);
     text-decoration: underline;
 }
 
+/* -------------------------------------------------
+   Layout
+------------------------------------------------- */
 main {
     padding: 40px;
     max-width: 900px;
     margin: 0 auto;
 }
 
+/* -------------------------------------------------
+   Headings
+------------------------------------------------- */
 h1 {
-    color: #facc15;
+    color: var(--h1);
     font-size: 2.5rem;
     margin-bottom: 10px;
 }
 
+h2 {
+    color: var(--h2);
+    margin-top: 40px;
+}
+
+h3 {
+    color: var(--h3);
+}
+
+/* -------------------------------------------------
+   Text
+------------------------------------------------- */
 p {
     line-height: 1.7;
     font-size: 1.05rem;
+    color: var(--fg);
 }
 
 ul {
@@ -64,4 +88,54 @@ ul {
 
 li {
     margin-bottom: 8px;
+    color: var(--fg);
+}
+
+/* -------------------------------------------------
+   Links
+------------------------------------------------- */
+a {
+    color: var(--link);
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+/* -------------------------------------------------
+   Code Blocks (future-safe)
+------------------------------------------------- */
+pre, code {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    border-radius: 4px;
+}
+
+/* -------------------------------------------------
+   Images
+------------------------------------------------- */
+main img {
+    max-width: 640px;
+    height: auto;
+}
+
+main img.small {
+    max-width: 200px;
+}
+
+main img.medium {
+    max-width: 400px;
+}
+
+main img.large {
+    max-width: 800px;
+}
+
+/* -------------------------------------------------
+   Utility (future use)
+------------------------------------------------- */
+hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
 }
