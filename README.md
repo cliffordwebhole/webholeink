@@ -27,6 +27,35 @@ This release establishes:
 
 No new features will be added to core without a version bump.
 
+## v0.1.2 — Platform Hardening & Documentation
+
+This release builds **around** the locked core without modifying it.
+
+v0.1.2 focuses on operational stability, discoverability, and long-term maintainability rather than new features.
+
+This release adds:
+
+- Full documentation system (`/docs`) rendered from Markdown
+- Canonical URLs, Open Graph, and Twitter metadata
+- RSS (`feed.xml`) and JSON Feed (`feed.json`)
+- Sitemap generation (`sitemap.xml`)
+- Robots.txt for crawler control
+- HTTP security headers
+- HTTP caching with ETag and Last-Modified support
+- Draft-aware content exclusion
+- CLI tooling for content creation
+- Deployment and operations documentation
+
+No changes were made to:
+
+- Core routing logic
+- Content resolution rules
+- View or layout contracts
+- Markdown parsing behavior
+
+The core remains **stable, locked, and boring**.
+
+v0.1.2 establishes WebholeInk as a **production-ready publishing platform** while preserving the integrity of the core engine.
 ---
 
 ## 🎯 Philosophy
@@ -84,7 +113,18 @@ app/themes/default/ ├── layout.php ├── home.php ├── page.php �
 - Assets are served from `public/themes/`
 
 ---
+### 🎨 Author-Controlled Themes
 
+WebholeInk supports multiple visual themes per site.
+
+- Themes are selected by the publisher
+- Visitors cannot toggle themes
+- Themes are versioned and cache-safe
+- No JavaScript required
+
+This ensures predictable rendering and long-term maintainability.
+
+---
 ## 📚 Contracts (Locked)
 
 Core behavior is defined by explicit contracts:
@@ -149,7 +189,6 @@ Core principles will not change.
 ## 🐝 Built By
 
 Clifford Webhole  
-with Houston as copilot ☺️
 
 ---
 
