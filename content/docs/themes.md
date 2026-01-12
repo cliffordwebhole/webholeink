@@ -1,33 +1,77 @@
 ---
 title: Themes
-description: WebholeInk documentation
+description: WebholeInk Theme Documentation
 draft: false
 ---
 
 # THEMES.md (Contract)
 
-Themes define presentation only.
+WebholeInk uses a **two-layer CSS theming system** designed for stability,
+clarity, and long-term maintainability.
 
-## Theme location
-- Theme source: `app/themes/<theme>/`
-- Public assets: `public/themes/<theme>/assets/`
+Themes are **author-controlled**. Visitors cannot toggle themes.
 
-## Active theme
-- Selected via `config/theme.php`
-- Default: `default`
+---
 
-## Required theme files (v0.1.x)
-- `layout.php` — wraps page output and includes navigation/footer
-- `navigation.php` — renders navigation menu
-- `home.php` — template for home page
-- `page.php` — template for content pages
-- `footer.php` — footer markup
-- `theme.php` — optional theme metadata
+## Theme Architecture
 
-## Rendering rules
-- Core supplies page body HTML as a string
-- Theme templates must not access core internals directly
-- Templates only use variables passed by View/PageView
+WebholeInk separates styling into two distinct layers:
 
-## Contract lock
-Any change to required files or rules requires doc update first.
+### 1. Structural CSS (Engine-Controlled)
+/public/themes/default/assets/css/style.css
+
+This file defines:
+- Layout
+- Typography
+- Spacing
+- Navigation structure
+- Image behavior
+- Element selectors
+
+This file **must not be modified for branding or color changes**.
+
+---
+
+### 2. Theme Variable CSS (Publisher-Controlled)
+/public/themes/default/assets/css/theme-dark.v1.css
+These files define **CSS variables only**:
+
+- Colors
+- Contrast
+- Mood
+- Brand identity
+
+**No selectors are allowed** in theme files.
+
+---
+
+## Available Themes
+
+Themes are defined and activated via configuration:
+/app/config/theme.php
+Example:
+
+```php
+<?php
+
+return [
+    'available' => ['classic', 'light', 'dark'],
+    'default'   => 'classic',
+    'active'    => 'dark',
+];
+```
+Changing the active value immediately switches the site theme.
+## Versioning Rules
+- Theme files are versioned (.v1.css)
+- Breaking visual changes require a version bump
+- Old theme versions remain valid indefinitely
+
+## Design Principles
+- One theme per site
+- No runtime theme switching
+- No JavaScript
+- No user preference storage
+- Predictable rendering
+
+WebholeInk themes are intentional, not interactive.
+

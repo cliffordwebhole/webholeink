@@ -1,0 +1,47 @@
+/*
+|--------------------------------------------------------------------------
+| WebholeInk — Light Theme
+|--------------------------------------------------------------------------
+| This file defines ONLY CSS variables.
+| Layout, spacing, and structure live in style.css
+| Do not put selectors in this file.
+|--------------------------------------------------------------------------
+*/
+
+:root {
+    /* Base colors */
+    --bg: #ffffff;
+    --fg: #111827;
+    --muted: #6b7280;
+
+    /* Accents */
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+
+    /* Borders & surfaces */
+    --border: #e5e7eb;
+    --surface: #f9fafb;
+
+    /* Code & pre */
+    --code-bg: #f3f4f6;
+    --code-fg: #1f2937;
+
+    /* Links */
+    --link: #2563eb;
+    --link-hover: #1e40af;
+
+    /* Nav */
+    --nav-bg: #ffffff;
+    --nav-fg: #111827;
+    --nav-border: #e5e7eb;
+
+    /* Headings */
+    --h1: #030712;
+    --h2: #030712;
+    --h3: #030712;
+
+    /* Status / callouts (future-safe) */
+    --success: #15803d;
+    --warning: #a16207;
+    --danger:  #b91c1c;
+}

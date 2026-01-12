@@ -19,6 +19,16 @@ There are:
 Upgrading WebholeInk is a controlled file replacement process.
 
 ---
+## Theme Compatibility
+
+Theme files are versioned.
+
+- Existing theme versions will never be broken
+- New visual changes require a new theme version
+- Publishers may upgrade themes independently of engine updates
+
+Theme compatibility is guaranteed across minor releases.
+
 
 ## Versioning Policy
 
