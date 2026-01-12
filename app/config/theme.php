@@ -18,7 +18,7 @@ return [
      |
      */
 
-    'active' => 'dark',
+    'active' => 'light',
     /*
      |--------------------------------------------------------------------------
      | Default Theme (Hard Fallback)
