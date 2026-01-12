@@ -113,7 +113,18 @@ app/themes/default/ ├── layout.php ├── home.php ├── page.php �
 - Assets are served from `public/themes/`
 
 ---
+### 🎨 Author-Controlled Themes
 
+WebholeInk supports multiple visual themes per site.
+
+- Themes are selected by the publisher
+- Visitors cannot toggle themes
+- Themes are versioned and cache-safe
+- No JavaScript required
+
+This ensures predictable rendering and long-term maintainability.
+
+---
 ## 📚 Contracts (Locked)
 
 Core behavior is defined by explicit contracts:
