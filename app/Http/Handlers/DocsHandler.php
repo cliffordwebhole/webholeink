@@ -27,13 +27,16 @@ final class DocsHandler implements HandlerInterface
 
         usort($docs, fn ($a, $b) => strcmp($a['name'], $b['name']));
 
+        // ✅ Load site config BEFORE render
+        $site = require WEBHOLEINK_ROOT . '/app/config/site.php';
+
         $view = new View('default');
 
         return new Response(
             $view->render('docs', [
                 'title'       => 'Documentation',
                 'description' => 'WebholeInk documentation',
-                'canonical'   => 'https://webholeink.org/docs',
+                'canonical'   => $site['url'] . '/docs',
                 'docs'        => $docs,
             ]),
             200,

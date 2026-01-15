@@ -23,4 +23,4 @@ You can download this software for free on our
 
 Trust me — it’s **Clifford Webhole approved**.
 
-![Clifford Webhole](/media/pages/clifford-webhole.png)
+![Clifford Webhole](/media/pages/example-0.jpg)

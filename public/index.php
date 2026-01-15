@@ -35,8 +35,11 @@ $router->get('/', new HomeHandler());
 $router->get('/posts', new PostsHandler());
 $router->get('/sitemap.xml', new SitemapHandler());
 $router->get('/feed.xml', new FeedHandler());
-$router->get('/feed.json', new FeedJsonHandler());
-
+$router->get('/feed.json', new FeedJsonHandler(
+    new \WebholeInk\Core\PostResolver(
+        WEBHOLEINK_ROOT . '/content/posts'
+    )
+));
 /**
  * Fallback pages
  */
