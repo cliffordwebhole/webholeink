@@ -19,26 +19,30 @@ final class PageHandler implements HandlerInterface
         $path = trim($request->path(), '/');
         $view = new View('default');
 
-/*
- * -------------------------------------------------
- * Docs index: /docs
- * -------------------------------------------------
- */
-if ($path === 'docs') {
-    $resolver = new \WebholeInk\Core\DocResolver(WEBHOLEINK_ROOT . '/content/docs');
-    $docs = $resolver->index();
+        // ✅ Site config (single source of truth)
+        $site = require WEBHOLEINK_ROOT . '/app/config/site.php';
+        $baseUrl = rtrim($site['url'], '/');
 
-    return new Response(
-        $view->render('docs', [
-            'title'       => 'Documentation',
-            'description' => 'WebholeInk documentation',
-            'canonical'   => 'https://webholeink.org/docs',
-            'docs'        => $docs,
-        ]),
-        200,
-        ['Content-Type' => 'text/html; charset=UTF-8']
-    );
-}
+        /*
+         * -------------------------------------------------
+         * Docs index: /docs
+         * -------------------------------------------------
+         */
+        if ($path === 'docs') {
+            $resolver = new DocResolver(WEBHOLEINK_ROOT . '/content/docs');
+            $docs = $resolver->index();
+
+            return new Response(
+                $view->render('docs', [
+                    'title'       => 'Documentation',
+                    'description' => 'WebholeInk documentation',
+                    'canonical'   => $baseUrl . '/docs',
+                    'docs'        => $docs,
+                ]),
+                200,
+                ['Content-Type' => 'text/html; charset=UTF-8']
+            );
+        }
 
         /*
          * -------------------------------------------------
@@ -56,7 +60,7 @@ if ($path === 'docs') {
                     $view->render('page', [
                         'title'       => '404',
                         'description' => '',
-                        'canonical'   => 'https://webholeink.org/docs/' . $slug,
+                        'canonical'   => $baseUrl . '/docs/' . $slug,
                         'content'     => '<h1>404 – Document not found</h1>',
                     ]),
                     404
@@ -67,7 +71,7 @@ if ($path === 'docs') {
                 $view->render('page', [
                     'title'       => (string) ($doc['meta']['title'] ?? ucfirst($slug)),
                     'description' => (string) ($doc['meta']['description'] ?? ''),
-                    'canonical'   => 'https://webholeink.org/docs/' . $slug,
+                    'canonical'   => $baseUrl . '/docs/' . $slug,
                     'content'     => (string) $doc['content'],
                 ]),
                 200,
@@ -92,7 +96,7 @@ if ($path === 'docs') {
                     $view->render('page', [
                         'title'       => '404',
                         'description' => '',
-                        'canonical'   => 'https://webholeink.org/posts/' . $slug,
+                        'canonical'   => $baseUrl . '/posts/' . $slug,
                         'content'     => '<h1>404 – Post not found</h1>',
                     ]),
                     404
@@ -103,7 +107,7 @@ if ($path === 'docs') {
                 $view->render('post', [
                     'title'       => (string) ($post['meta']['title'] ?? 'WebholeInk'),
                     'description' => (string) ($post['meta']['description'] ?? ''),
-                    'canonical'   => 'https://webholeink.org/posts/' . $slug,
+                    'canonical'   => $baseUrl . '/posts/' . $slug,
                     'date'        => (string) ($post['meta']['date'] ?? ''),
                     'content'     => (string) $post['content'],
                 ]),
@@ -125,7 +129,7 @@ if ($path === 'docs') {
                 $view->render('page', [
                     'title'       => '404',
                     'description' => '',
-                    'canonical'   => 'https://webholeink.org' . $request->path(),
+                    'canonical'   => $baseUrl . $request->path(),
                     'content'     => '<h1>404 – Page not found</h1>',
                 ]),
                 404
@@ -136,13 +140,13 @@ if ($path === 'docs') {
         $parsed = $md->parseWithFrontMatter((string) ($page['body'] ?? ''));
 
         $slug = (string) ($page['slug'] ?? 'home');
-        $canonical = $slug === 'home' ? '/' : '/' . $slug;
+        $canonicalPath = $slug === 'home' ? '/' : '/' . $slug;
 
         return new Response(
             $view->render('page', [
                 'title'       => (string) ($page['meta']['title'] ?? ucfirst($slug)),
                 'description' => (string) ($page['meta']['description'] ?? ''),
-                'canonical'   => 'https://webholeink.org' . $canonical,
+                'canonical'   => $baseUrl . $canonicalPath,
                 'content'     => (string) ($parsed['html'] ?? ''),
             ]),
             200,

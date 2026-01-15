@@ -16,7 +16,12 @@ final class Layout
     public function render(string $content, array $meta = []): string
     {
         // -------------------------------------------------
-        // Theme resolution (author-controlled)
+        // Site config
+        // -------------------------------------------------
+        $site = require WEBHOLEINK_ROOT . '/app/config/site.php';
+
+        // -------------------------------------------------
+        // Theme config (author-controlled)
         // -------------------------------------------------
         $themeConfig = require WEBHOLEINK_ROOT . '/app/config/theme.php';
 
@@ -32,20 +37,18 @@ final class Layout
         // Metadata
         // -------------------------------------------------
         $title = htmlspecialchars(
-            (string)($meta['title'] ?? 'WebholeInk'),
+            (string)($meta['title'] ?? $site['name']),
             ENT_QUOTES,
             'UTF-8'
         );
 
         $description = !empty($meta['description'])
             ? htmlspecialchars((string)$meta['description'], ENT_QUOTES, 'UTF-8')
-            : '';
+            : htmlspecialchars((string)$site['description'], ENT_QUOTES, 'UTF-8');
 
-        $url = htmlspecialchars(
-            (string)($meta['canonical'] ?? ''),
-            ENT_QUOTES,
-            'UTF-8'
-        );
+        $canonical = !empty($meta['canonical'])
+            ? htmlspecialchars((string)$meta['canonical'], ENT_QUOTES, 'UTF-8')
+            : '';
 
         $isDraft  = !empty($meta['draft']);
         $pageType = (string)($meta['type'] ?? 'website');
@@ -62,42 +65,25 @@ final class Layout
         $head = [];
 
         $head[] = "<title>{$title}</title>";
+        $head[] = "<meta name=\"description\" content=\"{$description}\">";
 
-        if ($description !== '') {
-            $head[] = "<meta name=\"description\" content=\"{$description}\">";
-        }
-
-        if ($url !== '') {
-            $head[] = "<link rel=\"canonical\" href=\"{$url}\">";
+        if ($canonical !== '') {
+            $head[] = "<link rel=\"canonical\" href=\"{$canonical}\">";
         }
 
         if ($isDraft) {
             $head[] = '<meta name="robots" content="noindex, nofollow">';
         }
 
-        // Open Graph
-        $head[] = '<meta property="og:site_name" content="WebholeInk">';
+        $head[] = '<meta property="og:site_name" content="' . htmlspecialchars($site['name'], ENT_QUOTES, 'UTF-8') . '">';
         $head[] = "<meta property=\"og:type\" content=\"{$pageType}\">";
         $head[] = "<meta property=\"og:title\" content=\"{$title}\">";
-
-        if ($description !== '') {
-            $head[] = "<meta property=\"og:description\" content=\"{$description}\">";
-        }
-
-        if ($url !== '') {
-            $head[] = "<meta property=\"og:url\" content=\"{$url}\">";
-        }
-
+        $head[] = "<meta property=\"og:description\" content=\"{$description}\">";
         $head[] = "<meta property=\"og:image\" content=\"{$ogImage}\">";
 
-        // Twitter / X
         $head[] = '<meta name="twitter:card" content="summary_large_image">';
         $head[] = "<meta name=\"twitter:title\" content=\"{$title}\">";
-
-        if ($description !== '') {
-            $head[] = "<meta name=\"twitter:description\" content=\"{$description}\">";
-        }
-
+        $head[] = "<meta name=\"twitter:description\" content=\"{$description}\">";
         $head[] = "<meta name=\"twitter:image\" content=\"{$ogImage}\">";
 
         // -------------------------------------------------
@@ -108,26 +94,32 @@ final class Layout
 <head>
     <meta charset="utf-8">
     ' . implode("\n    ", $head) . '
-
-    <!-- Base structural CSS (engine rules) -->
     <link rel="stylesheet" href="/themes/default/assets/css/style.css">
-
-    <!-- Theme variables (ONE file only) -->
-    <link rel="stylesheet" href="/themes/default/assets/css/theme-'
-        . htmlspecialchars($theme, ENT_QUOTES, 'UTF-8')
-        . '.v1.css">
-
+    <link rel="stylesheet" href="/themes/default/assets/css/theme-' . htmlspecialchars($theme, ENT_QUOTES, 'UTF-8') . '.v1.css">
     <link rel="alternate" type="application/rss+xml"
-          title="WebholeInk RSS"
-          href="https://webholeink.org/feed.xml">
+          title="' . htmlspecialchars($site['name'], ENT_QUOTES, 'UTF-8') . ' RSS"
+          href="' . htmlspecialchars($site['url'], ENT_QUOTES, 'UTF-8') . '/feed.xml">
 </head>
 <body>
 ' . $this->renderNavigation() . '
 <main>
 ' . $content . '
 </main>
+
+<footer class="site-footer">
+    <p>
+        &copy; ' . date('Y') . ' '
+        . htmlspecialchars($site['name'], ENT_QUOTES, 'UTF-8') .
+        ' · Powered by
+        <a href="https://webholeink.com" rel="noopener" target="_blank">
+            WebholeInk
+        </a>
+    </p>
+</footer>
+
 </body>
 </html>';
+
     }
 
     private function renderNavigation(): string

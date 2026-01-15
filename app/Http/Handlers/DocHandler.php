@@ -13,6 +13,10 @@ final class DocHandler implements HandlerInterface
 {
     public function handle(Request $request): Response
     {
+        // Site config (single source of truth)
+        $site = require WEBHOLEINK_ROOT . '/app/config/site.php';
+        $baseUrl = rtrim($site['url'], '/');
+
         // Expected path: /docs/{slug}
         $path = trim($request->path(), '/');
 
@@ -54,7 +58,7 @@ final class DocHandler implements HandlerInterface
             (new View('default'))->render('doc', [
                 'title'       => (string) ($meta['title'] ?? ucfirst($slug)),
                 'description' => (string) ($meta['description'] ?? 'WebholeInk documentation'),
-                'canonical'   => 'https://webholeink.org/docs/' . $slug,
+                'canonical'   => $baseUrl . '/docs/' . $slug,
                 'content'     => (string) $doc['content'],
             ]),
             200,

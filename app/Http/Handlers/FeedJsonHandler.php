@@ -6,50 +6,51 @@ namespace WebholeInk\Http\Handlers;
 
 use WebholeInk\Http\Request;
 use WebholeInk\Http\Response;
+use WebholeInk\Http\Handlers\HandlerInterface;
 use WebholeInk\Core\PostResolver;
 
 final class FeedJsonHandler implements HandlerInterface
 {
+    private PostResolver $posts;
+    private array $site;
+
+    public function __construct()
+    {
+        $this->site = require WEBHOLEINK_ROOT . '/app/config/site.php';
+
+        $this->posts = new PostResolver(
+            WEBHOLEINK_ROOT . '/content/posts'
+        );
+    }
+
     public function handle(Request $request): Response
     {
-        $resolver = new PostResolver(
-            __DIR__ . '/../../../content/posts'
-        );
-
-        $posts = $resolver->index();
-
         $items = [];
 
-        foreach ($posts as $post) {
-            if (!empty($post['draft'])) {
-                continue;
-            }
-$baseUrl = 'https://webholeink.org';
+        foreach ($this->posts->index() as $post) {
+            $url = rtrim($this->site['url'], '/') . $post['url'];
 
-$items[] = [
-    'id'   => $baseUrl . '/posts/' . $post['slug'],
-    'url'  => $baseUrl . '/posts/' . $post['slug'],
-    'title' => $post['title'],
-    'summary' => $post['description'] ?? '',
-    'content_html' => '',
-    'date_published' => (new \DateTimeImmutable($post['date']))
-        ->format(DATE_ATOM),
-];
-
+            $items[] = [
+                'id'    => $url,
+                'url'   => $url,
+                'title' => $post['title'],
+                'summary' => $post['description'],
+                'date_published' => $post['date'],
+            ];
         }
 
         $feed = [
             'version' => 'https://jsonfeed.org/version/1.1',
-            'title' => 'WebholeInk',
-            'home_page_url' => 'https://webholeink.org',
-            'feed_url' => 'https://webholeink.org/feed.json',
-            'items' => $items,
+            'title'   => $this->site['name'],
+            'home_page_url' => $this->site['url'],
+            'feed_url' => rtrim($this->site['url'], '/') . '/feed.json',
+            'items'   => $items,
         ];
 
         return new Response(
             json_encode($feed, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
             200,
-            ['Content-Type' => 'application/feed+json; charset=UTF-8']
+            ['Content-Type' => 'application/json; charset=utf-8']
         );
     }
 }

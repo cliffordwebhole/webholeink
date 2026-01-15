@@ -13,57 +13,63 @@ final class SitemapHandler implements HandlerInterface
 {
     public function handle(Request $request): Response
     {
-        $base = 'https://webholeink.org';
+        $site = require WEBHOLEINK_ROOT . '/app/config/site.php';
+
+        $baseUrl = rtrim((string) ($site['url'] ?? ''), '/');
 
         $urls = [];
-        $seen = [];
 
-        $add = function (string $path, string $lastmod) use (&$urls, &$seen, $base): void {
-            if (isset($seen[$path])) {
-                return;
+        // -------------------------------------------------
+        // Homepage
+        // -------------------------------------------------
+        $urls[] = $baseUrl . '/';
+
+        // -------------------------------------------------
+        // Pages (navigation-aware, non-draft)
+        // -------------------------------------------------
+        $pageResolver = new PageResolver(WEBHOLEINK_ROOT . '/content');
+
+        foreach ($pageResolver->navigationItems() as $page) {
+            $path = (string) ($page['path'] ?? '');
+
+            if ($path === '/' || $path === '') {
+                continue;
             }
 
-            $seen[$path] = true;
-
-            $urls[] = [
-                'loc'     => $base . $path,
-                'lastmod' => $lastmod,
-            ];
-        };
-
-        // Homepage
-        $add('/', date('Y-m-d'));
-
-        // Pages
-        $pages = new PageResolver(__DIR__ . '/../../../content');
-        foreach ($pages->navigationItems() as $page) {
-            $add(
-                $page['path'],
-                date('Y-m-d')
-            );
+            $urls[] = $baseUrl . $path;
         }
 
+        // -------------------------------------------------
         // Posts
-        $posts = new PostResolver(__DIR__ . '/../../../content/posts');
-        foreach ($posts->index() as $post) {
-            $add(
-                $post['url'],
-                $post['date'] ?: date('Y-m-d')
-            );
+        // -------------------------------------------------
+        $postResolver = new PostResolver(WEBHOLEINK_ROOT . '/content/posts');
+
+        foreach ($postResolver->index() as $post) {
+            $urls[] = $baseUrl . (string) $post['url'];
         }
 
+        // -------------------------------------------------
         // Build XML
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
+        // -------------------------------------------------
+        $entries = '';
 
         foreach ($urls as $url) {
-            $xml .= "  <url>\n";
-            $xml .= "    <loc>{$url['loc']}</loc>\n";
-            $xml .= "    <lastmod>{$url['lastmod']}</lastmod>\n";
-            $xml .= "  </url>\n";
+            $loc = htmlspecialchars($url, ENT_XML1, 'UTF-8');
+
+            $entries .= <<<XML
+<url>
+  <loc>{$loc}</loc>
+</url>
+
+XML;
         }
 
-        $xml .= '</urlset>';
+        $xml = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{$entries}
+</urlset>
+XML;
 
         return new Response(
             $xml,
