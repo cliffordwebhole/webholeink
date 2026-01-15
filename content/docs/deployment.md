@@ -16,6 +16,8 @@ beyond a standard web stack.
 
 If you can deploy PHP behind Nginx, you can deploy WebholeInk.
 
+See [Installation](./INSTALL.md) for first-time setup.
+
 # Deployment Philosophy
 
 WebholeInk follows the same philosophy in deployment as it does in architecture:

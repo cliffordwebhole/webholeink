@@ -205,7 +205,7 @@ _Developer-first publishing, without compromise._
 - [View Contract](docs/VIEW.md)
 - [Navigation Contract](docs/NAVIGATION.md)
 - [Project Status](docs/STATUS.md)
-
+- See [Installation](./INSTALL.md) for first-time setup.
 ## 📄 License
 
 WebholeInk is open-source software licensed under the MIT License.
