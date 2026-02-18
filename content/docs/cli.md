@@ -174,6 +174,15 @@ Errors are printed plainly.
 
 These will remain optional and non-intrusive.
 
+## Build Search Index
+
+Generate or rebuild the search index:
+
+```bash
+
+php bin/build-search-index.php
+
+```
 ## Summary
 
 The WebholeInk CLI is:
