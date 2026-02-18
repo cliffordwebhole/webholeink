@@ -26,16 +26,17 @@ final class Request
         $this->server = $server;
     }
 
-     public static function fromGlobals(): self
-{
-    return new self(
-        $_SERVER['REQUEST_METHOD'] ?? 'GET',
-        $_SERVER['REQUEST_URI'] ?? '/',
-        $_GET,
-        $_POST,
-        $_SERVER
-    );
-}
+    public static function fromGlobals(): self
+    {
+        return new self(
+            $_SERVER['REQUEST_METHOD'] ?? 'GET',
+            $_SERVER['REQUEST_URI'] ?? '/',
+            $_GET,
+            $_POST,
+            $_SERVER
+        );
+    }
+
     public function method(): string
     {
         return $this->method;
@@ -54,5 +55,36 @@ final class Request
         }
 
         return $path;
+    }
+
+    /**
+     * Get a query parameter (?q=something)
+     */
+    public function query(string $key, mixed $default = null): mixed
+    {
+        return $this->query[$key] ?? $default;
+    }
+
+    /**
+     * Optional helpers (handy later)
+     */
+    public function allQuery(): array
+    {
+        return $this->query;
+    }
+
+    public function uri(): string
+    {
+        return $this->uri;
+    }
+
+    public function server(string $key, mixed $default = null): mixed
+    {
+        return $this->server[$key] ?? $default;
+    }
+
+    public function post(string $key, mixed $default = null): mixed
+    {
+        return $this->post[$key] ?? $default;
     }
 }

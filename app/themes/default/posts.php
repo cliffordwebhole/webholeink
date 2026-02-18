@@ -20,14 +20,17 @@ declare(strict_types=1);
 <a href="/posts/<?= htmlspecialchars($post['slug'], ENT_QUOTES, 'UTF-8') ?>">
     <?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>
 </a>
-
 <?php if (!empty($post['date'])): ?>
-    <small>
-        <?= htmlspecialchars(
-            date('M j, Y', strtotime($post['date']))
-        ) ?>
-    </small>
+    <?php
+        $ts = strtotime((string) $post['date']);
+    ?>
+    <?php if ($ts !== false): ?>
+        <small>
+            <?= htmlspecialchars(date('M j, Y', $ts), ENT_QUOTES, 'UTF-8') ?>
+        </small>
+    <?php endif; ?>
 <?php endif; ?>
+
                 <?php if (!empty($post['excerpt'])): ?>
                     <p><?= htmlspecialchars($post['excerpt'], ENT_QUOTES, 'UTF-8') ?></p>
                 <?php endif; ?>

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace WebholeInk\Http\Handlers;
 
-use WebholeInk\Http\Request;
-use WebholeInk\Http\Response;
 use WebholeInk\Core\DocResolver;
 use WebholeInk\Core\View;
+use WebholeInk\Http\Request;
+use WebholeInk\Http\Response;
 
 final class DocHandler implements HandlerInterface
 {
@@ -15,27 +15,30 @@ final class DocHandler implements HandlerInterface
     {
         // Site config (single source of truth)
         $site = require WEBHOLEINK_ROOT . '/app/config/site.php';
-        $baseUrl = rtrim($site['url'], '/');
+        $baseUrl = rtrim((string)($site['url'] ?? ''), '/');
 
-        // Expected path: /docs/{slug}
+        // Expected incoming paths: /docs/<slug> (router sends all /docs/* here)
         $path = trim($request->path(), '/');
 
-        // Guard: prevent /docs from being treated as a document
+        // If someone hits /docs or /docs/ with no slug, send them to docs index
         if ($path === 'docs') {
+            return new Response('', 302, ['Location' => '/docs']);
+        }
+
+        // Extract slug after "docs/"
+        if (!str_starts_with($path, 'docs/')) {
             return new Response(
-                '<h1>404 – Document not found</h1>',
+                '<h1>404 - Document not found</h1>',
                 404,
                 ['Content-Type' => 'text/html; charset=UTF-8']
             );
         }
 
-        // Extract slug
-        $slug = substr($path, strlen('docs/'));
-        $slug = trim($slug, '/');
+        $slug = trim(substr($path, strlen('docs/')), '/');
 
         if ($slug === '') {
             return new Response(
-                '<h1>404 – Document not found</h1>',
+                '<h1>404 - Document not found</h1>',
                 404,
                 ['Content-Type' => 'text/html; charset=UTF-8']
             );
@@ -46,7 +49,7 @@ final class DocHandler implements HandlerInterface
 
         if ($doc === null) {
             return new Response(
-                '<h1>404 – Document not found</h1>',
+                '<h1>404 - Document not found</h1>',
                 404,
                 ['Content-Type' => 'text/html; charset=UTF-8']
             );
@@ -56,10 +59,10 @@ final class DocHandler implements HandlerInterface
 
         return new Response(
             (new View('default'))->render('doc', [
-                'title'       => (string) ($meta['title'] ?? ucfirst($slug)),
-                'description' => (string) ($meta['description'] ?? 'WebholeInk documentation'),
+                'title'       => (string)($meta['title'] ?? ucfirst($slug)),
+                'description' => (string)($meta['description'] ?? 'WebholeInk documentation'),
                 'canonical'   => $baseUrl . '/docs/' . $slug,
-                'content'     => (string) $doc['content'],
+                'content'     => (string)($doc['content'] ?? ''),
             ]),
             200,
             ['Content-Type' => 'text/html; charset=UTF-8'],
